@@ -11,12 +11,16 @@ namespace DatingApp.Api.Validators
         public CreateUserValidator(IAuthRepository authRepository)
         {
             _authRepository = authRepository;
-            RuleFor(cu => cu.UserName).NotEmpty();
-            RuleFor(cu => cu.UserName).Must(userName => {
-                return !_authRepository.UserNameExists(userName);
-            }).WithMessage("User already exists!");
+            RuleFor(cu => cu.UserName)
+                .NotEmpty();
+            RuleFor(cu => cu.UserName)
+                .Must(userName => { return !_authRepository.UserNameExists(userName); })
+                .WithMessage("User already exists!");
 
-            RuleFor(cu => cu.Password).NotEmpty().MinimumLength(4).MaximumLength(8);
-        }   
+            RuleFor(cu => cu.Password)
+                .NotEmpty()
+                .MinimumLength(4)
+                .MaximumLength(8);
+        }
     }
 }

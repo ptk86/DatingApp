@@ -7,8 +7,10 @@ namespace DatingApp.Api.Validators
     {
         public LoginUserValidator()
         {
-            RuleFor(cu => cu.UserName).NotEmpty();
-            RuleFor(cu => cu.Password).NotEmpty();
-        }   
+            RuleFor(cu => cu.UserName)
+                .NotEmpty();
+            RuleFor(cu => cu.Password)
+                .NotEmpty();
+        }
     }
 }

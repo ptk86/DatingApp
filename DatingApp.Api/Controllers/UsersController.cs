@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using DatingApp.Api.Data;
 using DatingApp.Api.Dto;
-using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -30,7 +29,7 @@ namespace DatingApp.Api.Controllers
         {
             var user = await _authRepository.Register(createUser.UserName.ToLower(), createUser.Password);
 
-            if(user == null)
+            if (user == null)
             {
                 return BadRequest("Could not create user!");
             }
@@ -43,16 +42,20 @@ namespace DatingApp.Api.Controllers
         {
             var user = await _authRepository.Login(loginUser.UserName, loginUser.Password);
 
-            if(user == null)
+            if (user == null)
+            {
                 return Unauthorized();
+            }
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName.ToString())
+                new Claim(ClaimTypes.Name, user.UserName)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token")
+                                           .Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -67,9 +70,10 @@ namespace DatingApp.Api.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptior);
 
-            return Ok(new {
+            return Ok(new
+            {
                 token = tokenHandler.WriteToken(token)
             });
         }
     }
-};
+}

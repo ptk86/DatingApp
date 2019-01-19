@@ -1,6 +1,7 @@
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
-using DatingApp.Api.Data;
 using DatingApp.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,37 +15,22 @@ namespace DatingApp.Api.Data
         {
             _context = context;
         }
+
         public async Task<User> Login(string userName, string passowrd)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
-            if(user == null)
+            if (user == null)
             {
                 return null;
-            }                
-            
-            if(!VerifyPasswordHash(user.PasswordHash, user.PasswordSalt, passowrd))
+            }
+
+            if (!VerifyPasswordHash(user.PasswordHash, user.PasswordSalt, passowrd))
             {
                 return null;
             }
 
             return user;
-        }
-
-        private bool VerifyPasswordHash(byte[] passwordHash, byte[] passwordSalt, string passowrd)
-        {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passowrd));
-                for(int i = 0; i < computedHash.Length; i++)
-                {
-                    if(computedHash[i] != passwordHash[i])
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
 
         public async Task<User> Register(string userName, string passowrd)
@@ -64,21 +50,38 @@ namespace DatingApp.Api.Data
             return userToCreate;
         }
 
+        public bool UserNameExists(string userName)
+        {
+            return _context.Users.Any(u => u.UserName == userName);
+        }
+
+        private bool VerifyPasswordHash(byte[] passwordHash, byte[] passwordSalt, string passowrd)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passowrd));
+                for (var i = 0; i < computedHash.Length; i++)
+                {
+                    if (computedHash[i] != passwordHash[i])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private (byte[] hash, byte[] salt) CreatePasswordHash(string password)
         {
             byte[] hash, salt;
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            using (var hmac = new HMACSHA512())
             {
                 salt = hmac.Key;
-                hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
 
             return (hash, salt);
-        }
-
-        public bool UserNameExists(string userName)
-        {
-            return  _context.Users.Any(u => u.UserName == userName);
         }
     }
 }
