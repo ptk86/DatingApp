@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DatingApp.Api
@@ -52,8 +53,12 @@ namespace DatingApp.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggingBuilder loggingBuilder)
         {
+
+            loggingBuilder.AddConsole()
+                .AddDebug();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
