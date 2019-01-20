@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using DatingApp.Api.Data;
+using DatingApp.Api.Middleware;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -57,6 +58,8 @@ namespace DatingApp.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             // app.UseHttpsRedirection();
             app.UseCors(c => c.AllowAnyOrigin()
