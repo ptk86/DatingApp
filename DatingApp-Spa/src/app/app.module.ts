@@ -16,6 +16,7 @@ import { MessagesComponent } from './messages/messages.component';
 import { NavComponent } from './nav/nav.component';
 import { RegisterComponent } from './register/register.component';
 import { ErrorInterceptorProvider } from './services/error-interceptor';
+import { MemberDetailComponent } from './members/member-detail/member-detail.component';
 
 export function tokenGetter(){
   return localStorage.getItem('token');
@@ -30,7 +31,8 @@ export function tokenGetter(){
     MemberListComponent,
     ListsComponent,
     MessagesComponent,
-    MemberCardComponent
+    MemberCardComponent,
+    MemberDetailComponent
   ],
   imports: [
     BrowserModule,
