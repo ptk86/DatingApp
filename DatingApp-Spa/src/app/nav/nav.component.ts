@@ -15,10 +15,12 @@ export class NavComponent implements OnInit {
   ngOnInit() {}
 
   login() {
-    this.auth.login(this.model).subscribe(
-      () => this.alertify.success('Logged in successfully!'),
-      e => this.alertify.error(e)
-    );
+    this.auth
+      .login(this.model)
+      .subscribe(
+        () => this.alertify.success('Logged in successfully!'),
+        e => this.alertify.error(e)
+      );
   }
 
   loggedIn(): boolean {
