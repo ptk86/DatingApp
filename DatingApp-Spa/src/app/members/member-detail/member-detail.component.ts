@@ -1,7 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
-import { UserService } from 'src/app/services/user.service';
-import { AlertifyService } from 'src/app/services/alertify.service';
 import { ActivatedRoute } from '@angular/router';
 import { UserDetail } from 'src/app/models/user-detail.model';
 
@@ -14,21 +11,12 @@ export class MemberDetailComponent implements OnInit {
   user: UserDetail;
 
   constructor(
-    private userService: UserService,
-    private altertifyService: AlertifyService,
-    private route: ActivatedRoute
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.loadUser();
-  }
-
-  loadUser(): void {
-    this.userService
-      .getUser(+this.route.snapshot.params['id'])
-      .subscribe(
-        user => (this.user = user),
-        error => this.altertifyService.error(error)
-      );
+    this.activatedRoute.data.subscribe(data => {
+        this.user = data['user'];
+    });
   }
 }
