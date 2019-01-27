@@ -1,0 +1,18 @@
+
+@host = http://localhost:2298/api
+@contentType = application/json
+
+@authorization = bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNSIsInVuaXF1ZV9uYW1lIjoiYWRtaW4xIiwibmJmIjoxNTQ4NjEyMjQ3LCJleHAiOjE1NDg2OTg2NDcsImlhdCI6MTU0ODYxMjI0N30.8SoMeLeBtDIJK-hla3DcAqqkqTRb68HqmJvhmVLMN3nUYy9KwvNj1YLSpibqMtUncJ-MOH8Xl1wNZ-K575baxQ
+###
+
+POST http://{{host}}/auth/login HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "userName": "admin1",
+    "password": "admin"
+}
+
+###
+GET {{host}}/users HTTP/1.1
+Authorization: {{authorization}}

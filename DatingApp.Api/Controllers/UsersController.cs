@@ -1,80 +1,39 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DatingApp.Api.Data;
-using DatingApp.Api.Dto;
+using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DatingApp.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
-    public class UsersController : ControllerBase
+    [Route("api/[controller]")]
+    public class UsersController : Controller
     {
-        private readonly IAuthRepository _authRepository;
-        private readonly IConfiguration _configuration;
+        private readonly DataContext _context;
 
-        public UsersController(IAuthRepository authRepository, IConfiguration configuration)
+        public UsersController(DataContext context)
         {
-            _authRepository = authRepository;
-            _configuration = configuration;
+            _context = context;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(CreateUser createUser)
+        [HttpGet]
+        public async Task<IActionResult> Get()
         {
-            var user = await _authRepository.Register(createUser.UserName.ToLower(), createUser.Password);
-
-            if (user == null)
-            {
-                return BadRequest("Could not create user!");
-            }
-
-            return StatusCode(201);
+            return Ok(await _context.Users.Include(x => x.Photos).ToListAsync());
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginUser loginUser)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
         {
-            var user = await _authRepository.Login(loginUser.UserName, loginUser.Password);
-
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
-            };
-
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token")
-                                           .Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var tokenDescriptior = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var token = tokenHandler.CreateToken(tokenDescriptior);
-
-            return Ok(new
-            {
-                token = tokenHandler.WriteToken(token)
-            });
+            return Ok(await _context.Users.Include(x => x.Photos).FirstOrDefaultAsync(x=>x.Id == id));
         }
     }
 }
