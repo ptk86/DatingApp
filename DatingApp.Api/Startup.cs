@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using AutoMapper;
 using DatingApp.Api.Data;
 using DatingApp.Api.Helpers;
 using DatingApp.Api.Middleware;
@@ -35,6 +36,8 @@ namespace DatingApp.Api
             services.AddScoped<IAuthRepository, AuthRepository>();
 
             services.AddTransient<Seeder>();
+
+            services.AddAutoMapper();
 
             services
                 .AddMvc()

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using DatingApp.Api.Data;
+using DatingApp.Api.Dto;
 using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,22 +21,26 @@ namespace DatingApp.Api.Controllers
     public class UsersController : Controller
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public UsersController(DataContext context)
+        public UsersController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.Users.Include(x => x.Photos).ToListAsync());
+            var users = await _context.Users.Include(x=>x.Photos).ToListAsync();
+            return Ok(_mapper.Map<List<UserListItem>>(users));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            return Ok(await _context.Users.Include(x => x.Photos).FirstOrDefaultAsync(x=>x.Id == id));
+            var user = await _context.Users.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Id == id);
+            return Ok(_mapper.Map<UserDetail>(user));
         }
     }
 }

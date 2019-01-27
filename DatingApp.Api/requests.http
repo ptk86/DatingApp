@@ -16,3 +16,7 @@ Content-Type: {{contentType}}
 ###
 GET {{host}}/users HTTP/1.1
 Authorization: {{authorization}}
+
+###
+GET {{host}}/users/14 HTTP/1.1
+Authorization: {{authorization}}
