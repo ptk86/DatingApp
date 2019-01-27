@@ -34,6 +34,7 @@ namespace DatingApp.Api.Middleware
             context.Response.ContentType = "application/json";
             context.Response.Headers.Add("Acces-Control-Expose-Headers", "Application-Error");
             context.Response.Headers.Add("Application-Error", "Application-Error");
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
             var errror = context.Features.Get<IExceptionHandlerFeature>();
 
