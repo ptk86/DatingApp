@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
-import { UserDetail } from '../models/user-detail.model';
-import { AlertifyService } from '../services/alertify.service';
+import { UserService } from '../../services/user.service';
+import { UserDetail } from '../../models/user-detail.model';
+import { AlertifyService } from '../../services/alertify.service';
 
 @Component({
   selector: 'app-member-list',
