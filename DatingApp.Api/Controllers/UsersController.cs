@@ -33,7 +33,7 @@ namespace DatingApp.Api.Controllers
         public async Task<IActionResult> Get()
         {
             var users = await _context.Users.Include(x=>x.Photos).ToListAsync();
-            return Ok(_mapper.Map<List<UserListItem>>(users));
+            return Ok(_mapper.Map<List<UserDetail>>(users));
         }
 
         [HttpGet("{id}")]
