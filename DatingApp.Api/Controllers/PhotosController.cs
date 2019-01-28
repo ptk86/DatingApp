@@ -40,7 +40,7 @@ namespace DatingApp.Api.Controllers
             _cloudinary = new Cloudinary(account);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var photo = await _dataContext.Photos.FirstOrDefaultAsync(p => p.Id == id);
@@ -51,7 +51,7 @@ namespace DatingApp.Api.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Post(int userId, PhotoCreate dto)
+        public async Task<IActionResult> Post(int userId, [FromForm]PhotoCreate dto)
         {
             var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (userId != int.Parse(tokenId))
@@ -59,7 +59,7 @@ namespace DatingApp.Api.Controllers
                 return Unauthorized();
             }
 
-            var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _dataContext.Users.Include(u => u.Photos).FirstOrDefaultAsync(u => u.Id == userId);
             var file = dto.File;
             var imageUploadResult = new ImageUploadResult();
 
@@ -84,7 +84,7 @@ namespace DatingApp.Api.Controllers
             await _dataContext.SaveChangesAsync();
 
             var photoToReturn = _mapper.Map<PhotoForUserDetail>(photo);
-            return CreatedAtRoute("Get", new {id = photo.Id}, photoToReturn);
+            return CreatedAtRoute("", new {id = photo.Id}, photoToReturn);
         }
     }
 }

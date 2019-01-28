@@ -20,3 +20,10 @@ Authorization: {{authorization}}
 ###
 GET {{host}}/users/14 HTTP/1.1
 Authorization: {{authorization}}
+
+###
+POST {{host}}/users/15/photos HTTP/1.1
+Authorization: {{authorization}}
+Content-Disposition: form-data; name="superman"; filename="Superman.jpg"
+
+<./Superman.jpg
