@@ -25,9 +25,9 @@ namespace DatingApp.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(CreateUser createUser)
+        public async Task<IActionResult> Register(UserCreate userCreate)
         {
-            var user = await _authRepository.Register(createUser.UserName.ToLower(), createUser.Password);
+            var user = await _authRepository.Register(userCreate.UserName.ToLower(), userCreate.Password);
 
             if (user == null)
             {

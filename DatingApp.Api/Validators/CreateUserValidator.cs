@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace DatingApp.Api.Validators
 {
-    public class CreateUserValidator : AbstractValidator<CreateUser>
+    public class CreateUserValidator : AbstractValidator<UserCreate>
     {
         private readonly IAuthRepository _authRepository;
 
