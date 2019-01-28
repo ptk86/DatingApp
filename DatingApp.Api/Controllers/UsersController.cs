@@ -56,7 +56,7 @@ namespace DatingApp.Api.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
             _mapper.Map(dto, user);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
