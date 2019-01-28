@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using CloudinaryDotNet;
@@ -49,6 +50,43 @@ namespace DatingApp.Api.Controllers
             return Ok(dto);
         }
 
+        [HttpPost]
+        [Route("{id}/SetMain")]
+        public async Task<IActionResult> SetMain(int userId, int id)
+        {
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _dataContext.Users.Include(u => u.Photos)
+                           .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return BadRequest("User does not exist in the database!");
+            }
+
+            if (user.Photos.All(p => p.Id != id))
+            {
+                return Unauthorized();
+            }
+
+            if (user.Photos.Any(p => p.IsMain && p.Id == id))
+            {
+                return NoContent();
+            }
+
+            user.Photos.
+                Where(p => p.Id == id || p.IsMain)
+                .ToList()
+                .ForEach(p => p.IsMain = !p.IsMain);
+
+            await _dataContext.SaveChangesAsync();
+
+            return NoContent();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Post(int userId, [FromForm]PhotoCreate dto)
