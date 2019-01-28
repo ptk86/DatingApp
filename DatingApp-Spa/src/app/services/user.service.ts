@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { UserDetail } from '../models/user-detail.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { UserDetail } from '../models/user-detail.model';
 export class UserService {
   baseUrl = environment.apiUrl + 'users/';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   getUsers(): Observable<UserDetail[]> {
     return this.http.get<UserDetail[]>(this.baseUrl);
@@ -22,5 +23,14 @@ export class UserService {
 
   updateUser(id: number, user: UserDetail) {
     return this.http.put(`${this.baseUrl}/${id}`, user);
+  }
+
+  setMainPhoto(id: number) {
+    return this.http.post(
+      `${this.baseUrl}${
+        this.authService.decondedToken.nameid
+      }/photos/${id}/setmain`,
+      {}
+    );
   }
 }
