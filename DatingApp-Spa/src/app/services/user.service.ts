@@ -33,4 +33,10 @@ export class UserService {
       {}
     );
   }
+
+  deletePhoto(id: number) {
+    return this.http.delete(
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/photos/${id}`
+    );
+  }
 }

@@ -24,3 +24,7 @@ Authorization: {{authorization}}
 ###
 POST {{host}}/users/15/photos/20/setmain HTTP/1.1
 Authorization: {{authorization}}
+
+###
+DELETE  {{host}}/users/15/photos/14 HTTP/1.1
+Authorization: {{authorization}}

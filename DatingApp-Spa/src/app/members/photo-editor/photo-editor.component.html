@@ -9,7 +9,11 @@
       >
         Main
       </button>
-      <button class="btn btn-sm btn-danger">
+      <button
+        class="btn btn-sm btn-danger"
+        [disabled]="photo.isMain"
+        (click)="delete(photo.id)"
+      >
         <i class="fa fa-trash-o"></i>
       </button>
     </div>

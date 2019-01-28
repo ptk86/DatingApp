@@ -77,4 +77,18 @@ export class PhotoEditorComponent implements OnInit {
       error => this.alertifyService.error(error)
     );
   }
+
+  delete(id: number) {
+    this.alertifyService.confirm(
+      'Are you sure you want to delete the photo?',
+      () => {
+        this.userService.deletePhoto(id).subscribe(
+          () => {
+            this.photos = this.photos.filter(p => p.id !== id);
+          },
+          error => this.alertifyService.error(error)
+        );
+      }
+    );
+  }
 }

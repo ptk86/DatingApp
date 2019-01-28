@@ -50,6 +50,56 @@ namespace DatingApp.Api.Controllers
             return Ok(dto);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int userId, int id)
+        {
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _dataContext.Users.Include(u => u.Photos)
+                           .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return BadRequest("User does not exist in the database!");
+            }
+
+            if (user.Photos.All(p => p.Id != id))
+            {
+                return Unauthorized();
+            }
+            
+            var photoToRemove = user.Photos.First(p => p.Id == id);
+
+            if (photoToRemove.IsMain)
+            {
+                return BadRequest("You cannot remove your main photo!");
+            }
+
+            if (photoToRemove.PublicId != null)
+            {
+                var deletionParams = new DeletionParams(photoToRemove.PublicId);
+                var result = _cloudinary.Destroy(deletionParams);
+
+                if (result.Result == "ok")
+                {
+                    user.Photos.Remove(photoToRemove);
+                }
+            }
+            else
+            {
+                user.Photos.Remove(photoToRemove);
+            }
+
+
+            await _dataContext.SaveChangesAsync();
+            return NoContent();
+        }
+
+
         [HttpPost]
         [Route("{id}/SetMain")]
         public async Task<IActionResult> SetMain(int userId, int id)
