@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -41,6 +42,23 @@ namespace DatingApp.Api.Controllers
         {
             var user = await _context.Users.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Id == id);
             return Ok(_mapper.Map<UserDetail>(user));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, UserUpdate dto)
+        {
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (id != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            _mapper.Map(dto, user);
+
+            _context.SaveChanges();
+
+            return NoContent();
         }
     }
 }
