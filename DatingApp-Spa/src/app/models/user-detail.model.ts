@@ -13,6 +13,6 @@ export interface UserDetail{
   photoUrl: string;
   introduction?: string;
   lookingFor?: string;
-  intrests?: string;
+  interests?: string;
   photos?: PhotoForUserDetail[];
 }
