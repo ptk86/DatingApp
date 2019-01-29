@@ -35,6 +35,8 @@ namespace DatingApp.Api
 
             services.AddDbContext<DataContext>(x =>
                                                    x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddScoped<LogUserActivity>();
             services.AddScoped<IAuthRepository, AuthRepository>();
 
             services.AddTransient<Seeder>();

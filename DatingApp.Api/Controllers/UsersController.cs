@@ -7,6 +7,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using DatingApp.Api.Data;
 using DatingApp.Api.Dto;
+using DatingApp.Api.Helpers;
 using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ namespace DatingApp.Api.Controllers
 {
     [Authorize]
     [ApiController]
+    [ServiceFilter(typeof(LogUserActivity))]
     [Route("api/[controller]")]
     public class UsersController : Controller
     {
