@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using DatingApp.Api.Data;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DatingApp.Api.Helpers
+﻿namespace DatingApp.Api.Helpers
 {
     public class CloudinarySettings
     {

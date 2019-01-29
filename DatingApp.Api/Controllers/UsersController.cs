@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using DatingApp.Api.Data;
 using DatingApp.Api.Dto;
 using DatingApp.Api.Helpers;
@@ -32,11 +29,13 @@ namespace DatingApp.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet(Name = "GetUsers")]
+        public async Task<IActionResult> Get([FromQuery]UserParams userParams)
         {
-            var users = await _context.Users.Include(x=>x.Photos).ToListAsync();
-            return Ok(_mapper.Map<List<UserDetail>>(users));
+            var users = _context.Users.Include(x => x.Photos);
+            var pagedUsers = await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
+            Response.AddPagination(pagedUsers.CurrentPage, pagedUsers.PageSize, pagedUsers.TotalCount, pagedUsers.TotalPages);
+            return Ok(_mapper.Map<List<UserDetail>>(pagedUsers));
         }
 
         [HttpGet("{id}", Name = "GetUser")]

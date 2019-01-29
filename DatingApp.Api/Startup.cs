@@ -3,7 +3,6 @@ using System.Text;
 using AutoMapper;
 using DatingApp.Api.Data;
 using DatingApp.Api.Helpers;
-using DatingApp.Api.Middleware;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;

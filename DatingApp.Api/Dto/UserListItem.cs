@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using DatingApp.Api.Models;
 
 namespace DatingApp.Api.Dto
 {
