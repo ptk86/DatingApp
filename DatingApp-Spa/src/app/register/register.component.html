@@ -5,7 +5,7 @@
     <input
       type="text"
       class="form-control"
-      formControlname="username"
+      formControlName="username"
       placeholder="Username"
     />
   </div>
@@ -13,7 +13,7 @@
     <input
       type="password"
       class="form-control"
-      formControlname="password"
+      formControlName="password"
       placeholder="Password"
     />
   </div>
@@ -21,7 +21,7 @@
     <input
       type="password"
       class="form-control"
-      formControlname="confirmPassword"
+      formControlName="confirmPassword"
       placeholder="Confirm Password"
     />
   </div>
@@ -32,3 +32,9 @@
     </button>
   </div>
 </form>
+
+{{registerFrom.value | json}}
+
+{{registerFrom.status | json}}
+{{registerFrom.errors | json}}
+
