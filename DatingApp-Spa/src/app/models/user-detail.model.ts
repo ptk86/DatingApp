@@ -1,6 +1,6 @@
 import { PhotoForUserDetail } from './photo-for-user-detail.model';
 
-export interface UserDetail{
+export interface UserDetail {
   id: number;
   username: string;
   knownAs: string;
