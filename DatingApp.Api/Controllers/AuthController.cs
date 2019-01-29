@@ -3,8 +3,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DatingApp.Api.Data;
 using DatingApp.Api.Dto;
+using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -17,24 +19,24 @@ namespace DatingApp.Api.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository authRepository, IConfiguration configuration)
+        public AuthController(IAuthRepository authRepository, IConfiguration configuration, IMapper mapper)
         {
             _authRepository = authRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserCreate userCreate)
         {
-            var user = await _authRepository.Register(userCreate.UserName.ToLower(), userCreate.Password);
+            var user = _mapper.Map<User>(userCreate);
+            await _authRepository.Register(user, userCreate.Password);
 
-            if (user == null)
-            {
-                return BadRequest("Could not create user!");
-            }
-
-            return StatusCode(201);
+            var userToReturn = _mapper.Map<UserDetail>(user);
+            
+            return CreatedAtRoute("GetUser", new { controller = "Users", id = user.Id }, userToReturn);
         }
 
         [HttpPost("login")]

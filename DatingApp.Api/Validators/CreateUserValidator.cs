@@ -16,7 +16,16 @@ namespace DatingApp.Api.Validators
             RuleFor(cu => cu.UserName)
                 .Must(userName => { return !_authRepository.UserNameExists(userName); })
                 .WithMessage("User already exists!");
-
+            RuleFor(cu => cu.Gender)
+                .NotEmpty();
+            RuleFor(cu => cu.DateOfBirth)
+                .NotEmpty();
+            RuleFor(cu => cu.KnownAs)
+                .NotEmpty();
+            RuleFor(cu => cu.City)
+                .NotEmpty();
+            RuleFor(cu => cu.Country)
+                .NotEmpty();
             RuleFor(cu => cu.Password)
                 .NotEmpty()
                 .MinimumLength(4)

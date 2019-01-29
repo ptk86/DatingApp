@@ -37,7 +37,7 @@ namespace DatingApp.Api.Controllers
             return Ok(_mapper.Map<List<UserDetail>>(users));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> Get(int id)
         {
             var user = await _context.Users.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Id == id);

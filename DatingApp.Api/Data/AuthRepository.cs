@@ -33,21 +33,15 @@ namespace DatingApp.Api.Data
             return user;
         }
 
-        public async Task<User> Register(string userName, string passowrd)
+        public async Task Register(User user, string passowrd)
         {
             var hashData = CreatePasswordHash(passowrd);
-
-            var userToCreate = new User
-            {
-                UserName = userName,
-                PasswordHash = hashData.hash,
-                PasswordSalt = hashData.salt
-            };
-
-            _context.Users.Add(userToCreate);
+            
+            user.PasswordHash = hashData.hash;
+            user.PasswordSalt = hashData.salt;
+            
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
-            return userToCreate;
         }
 
         public bool UserNameExists(string userName)

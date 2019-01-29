@@ -3,6 +3,22 @@
 @contentType = application/json
 
 @authorization = bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNSIsInVuaXF1ZV9uYW1lIjoiYWRtaW4xIiwibmJmIjoxNTQ4NzEwODk5LCJleHAiOjE1NDg3OTcyOTksImlhdCI6MTU0ODcxMDg5OX0.wppIua6SQoMBRRj9oU5cqgO-d68zNNVIMab02ZRq6TZQhkMRFZ03pygR_B8xAPUbhIbagVGMOtQBACz00fh1_g
+
+###
+
+POST {{host}}/auth/register HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "gender": "male",
+    "username": "test3",
+    "password": "password",
+    "knownAs": "nickname",
+    "dateOfBirth": "11/11/1918",
+    "city": "Czestochowa",
+    "country": "Poland"
+}
+
 ###
 
 POST {{host}}/auth/login HTTP/1.1
