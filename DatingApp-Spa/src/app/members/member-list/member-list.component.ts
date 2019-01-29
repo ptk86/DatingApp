@@ -12,7 +12,13 @@ import { AlertifyService } from 'src/app/services/alertify.service';
 })
 export class MemberListComponent implements OnInit {
   users: UserDetail[] = [];
+  genderList = [
+    { value: 'male', dispaly: 'Males' },
+    { value: 'female', dispaly: 'Females' }
+  ];
+  userParams: any = {};
   pagination: Pagination;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private userService: UserService,
@@ -26,6 +32,18 @@ export class MemberListComponent implements OnInit {
     this.activatedRoute.data.subscribe(
       data => (this.pagination = data['users'].pagination)
     );
+    this.setInitialUserParams();
+  }
+
+  setInitialUserParams(){
+    this.userParams.minAge = 18;
+    this.userParams.maxAge = 99;
+    this.userParams.gender = 'female';
+  }
+
+  resetFilters() {
+    this.setInitialUserParams();
+    this.loadUsers();
   }
 
   pageChanged(event: any): void {
@@ -35,7 +53,7 @@ export class MemberListComponent implements OnInit {
 
   loadUsers(): void {
     this.userService
-      .getUsers(this.pagination.currentPage, this.pagination.itemsPerPage)
+      .getUsers(this.pagination.currentPage, this.pagination.itemsPerPage, this.userParams)
       .subscribe(
         res => {
           this.users = res.result;
