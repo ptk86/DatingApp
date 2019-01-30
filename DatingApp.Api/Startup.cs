@@ -90,7 +90,7 @@ namespace DatingApp.Api
                                 });
                 });
             }
-            //seeder.Seed();
+            seeder.Seed();
 
             // app.UseHttpsRedirection();
             app.UseCors(c => c.AllowAnyOrigin()
