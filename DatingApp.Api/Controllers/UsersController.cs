@@ -36,17 +36,36 @@ namespace DatingApp.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             userParams.UserId = userId;
+            var currentUser = await _context.Users
+                                  .Include(u => u.Likers)
+                                  .Include(u => u.Likees)
+                                  .FirstOrDefaultAsync(u => u.Id == userId);
+            
 
-            if (string.IsNullOrEmpty(userParams.Gender))
+
+            var users = _context.Users.Include(u => u.Photos)
+                .AsQueryable();
+            users = users.Where(u => u.Id != userParams.UserId);
+
+            if (userParams.Likees && userParams.Likers)
+                return BadRequest("Cannot select likers and likees at the same time");
+
+            if (userParams.Likers)
             {
-                var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-                userParams.Gender = currentUser.Gender == "male" ? "female" : "male";
+                var currentUserLikersIds = currentUser.Likers.Select(l => l.LikerId);
+                users = users.Where(u => currentUserLikersIds.Contains(u.Id));
             }
 
-            var users = _context.Users.Include(u => u.Photos).OrderByDescending(u => u.LastActive).AsQueryable();
+            if (userParams.Likees)
+            {
+                var currentUserLikeesIds = currentUser.Likees.Select(l => l.LikeeId);
+                users = users.Where(u => currentUserLikeesIds.Contains(u.Id));
+            }
 
-            users = users.Where(u => u.Id != userParams.UserId);
-            users = users.Where(u => u.Gender == userParams.Gender);
+            if (!string.IsNullOrEmpty(userParams.Gender))
+            {
+                users = users.Where(u => u.Gender == userParams.Gender);
+            }
 
             if (userParams.MinAge != 18 || userParams.MaxAge != 99)
             {
@@ -69,7 +88,6 @@ namespace DatingApp.Api.Controllers
                 }
             }
 
-            
             var pagedUsers = await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
             Response.AddPagination(pagedUsers.CurrentPage, pagedUsers.PageSize, pagedUsers.TotalCount, pagedUsers.TotalPages);
             return Ok(_mapper.Map<List<UserDetail>>(pagedUsers));
@@ -80,6 +98,36 @@ namespace DatingApp.Api.Controllers
         {
             var user = await _context.Users.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Id == id);
             return Ok(_mapper.Map<UserDetail>(user));
+        }
+
+        [HttpPost("{id}/like/{recipientId}")]
+        public async Task<IActionResult> Like(int id, int recipientId)
+        {
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (id != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+            var user = await _context.Users.Include(u => u.Likees).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user.Likees.Any(l => l.LikeeId == recipientId))
+            {
+                return BadRequest("You already like this user!");
+            }
+
+            if (_context.Users.All(u => u.Id != recipientId))
+            {
+                return NotFound("The recipient doesn't exist!");
+            }
+
+            user.Likees.Add(new Like
+            {
+                LikeeId = recipientId
+            });
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Success!");
         }
 
         [HttpPut("{id}")]

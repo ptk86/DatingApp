@@ -2,8 +2,11 @@
 @host = http://localhost:2298/api
 @contentType = application/json
 
-@authorization = bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNSIsInVuaXF1ZV9uYW1lIjoiYWRtaW4xIiwibmJmIjoxNTQ4NzEwODk5LCJleHAiOjE1NDg3OTcyOTksImlhdCI6MTU0ODcxMDg5OX0.wppIua6SQoMBRRj9oU5cqgO-d68zNNVIMab02ZRq6TZQhkMRFZ03pygR_B8xAPUbhIbagVGMOtQBACz00fh1_g
+#id = 8
+#@authorization = bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI4IiwidW5pcXVlX25hbWUiOiJzdXNpZSIsIm5iZiI6MTU0ODgzMTU3NywiZXhwIjoxNTQ4OTE3OTc3LCJpYXQiOjE1NDg4MzE1Nzd9.vXe5BL0bEI88rxVNAY0XnDYEqLRnDoJSPnGDn4oJdmywMYfZZws8jO3KSWUl6QBQn0QPZsWHMiHeNfi_UPMydQ
 
+#id = 1
+@authorization = bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwidW5pcXVlX25hbWUiOiJ3YWxsZXIiLCJuYmYiOjE1NDg5NTkyMzQsImV4cCI6MTU0OTA0NTYzNCwiaWF0IjoxNTQ4OTU5MjM0fQ.YgmbadnfuIFIjH0nrJcUhv-MX3Ce6mWCKXWdNPk7WDeXTjOz2Xk0AcfBp9m0lrpWP1vOIM-74thZct0X2mS54g
 ###
 
 POST {{host}}/auth/register HTTP/1.1
@@ -25,8 +28,8 @@ POST {{host}}/auth/login HTTP/1.1
 Content-Type: {{contentType}}
 
 {
-    "userName": "admin1",
-    "password": "admin"
+    "userName": "waller",
+    "password": "password"
 }
 
 ###
@@ -41,7 +44,7 @@ Authorization: {{authorization}}
 GET {{host}}/users HTTP/1.1
 Authorization: {{authorization}}
 ###
-GET {{host}}/users?pageNumber=2&pageSize=3 HTTP/1.1
+GET {{host}}/users HTTP/1.1
 Authorization: {{authorization}}
 ###
 POST {{host}}/users/15/photos/20/setmain HTTP/1.1
@@ -49,4 +52,11 @@ Authorization: {{authorization}}
 
 ###
 DELETE  {{host}}/users/15/photos/14 HTTP/1.1
+Authorization: {{authorization}}
+
+###
+POST {{host}}/users/1/like/5 HTTP/1.1
+Authorization: {{authorization}}
+###
+GET {{host}}/users?likees=true HTTP/1.1
 Authorization: {{authorization}}
