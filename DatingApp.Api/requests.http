@@ -60,3 +60,15 @@ Authorization: {{authorization}}
 ###
 GET {{host}}/users?likees=true HTTP/1.1
 Authorization: {{authorization}}
+###
+POST {{host}}/users/1/messages HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: {{authorization}}
+
+{
+    "recipientId": "2",
+    "content": "test"
+}
+###
+Get {{host}}/users/1/messages/1 HTTP/1.1
+Authorization: {{authorization}}
