@@ -15,7 +15,12 @@ export class UserService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  getUsers(pageNumber?, pageSize?, userParams?): Observable<PaginatedResultResult<UserDetail[]>> {
+  getUsers(
+    pageNumber?,
+    pageSize?,
+    userParams?,
+    likesParam?: LikesParam
+  ): Observable<PaginatedResultResult<UserDetail[]>> {
     let params = new HttpParams();
     if (pageNumber && pageSize) {
       params = params.append('pageNumber', pageNumber);
@@ -29,20 +34,28 @@ export class UserService {
       params = params.append('orderBy', userParams.orderBy);
     }
 
+    if (likesParam && likesParam === 'likers') {
+      params = params.append('likers', 'true');
+    }
+
+    if (likesParam && likesParam === 'likees') {
+      params = params.append('likees', 'true');
+    }
+
     const paginatedResult = new PaginatedResultResult<UserDetail[]>();
     return this.http
       .get<UserDetail[]>(this.baseUrl, { params, observe: 'response' })
-        .pipe(
-          map(response => {
-            paginatedResult.result = response.body;
-            if (response.headers.get('pagination')) {
-              paginatedResult.pagination = JSON.parse(
-                response.headers.get('pagination')
-              );
-            }
-            return paginatedResult;
-          })
-        );
+      .pipe(
+        map(response => {
+          paginatedResult.result = response.body;
+          if (response.headers.get('pagination')) {
+            paginatedResult.pagination = JSON.parse(
+              response.headers.get('pagination')
+            );
+          }
+          return paginatedResult;
+        })
+      );
   }
 
   getUser(id: number): Observable<UserDetail> {
@@ -65,6 +78,12 @@ export class UserService {
   deletePhoto(id: number) {
     return this.http.delete(
       `${this.baseUrl}${this.authService.decondedToken.nameid}/photos/${id}`
+    );
+  }
+
+  like(likeeId: number) {
+    return this.http.post(
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/like/${likeeId}`, {}
     );
   }
 }

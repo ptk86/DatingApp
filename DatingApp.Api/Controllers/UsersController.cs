@@ -127,7 +127,7 @@ namespace DatingApp.Api.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok("Success!");
+            return Ok();
         }
 
         [HttpPut("{id}")]

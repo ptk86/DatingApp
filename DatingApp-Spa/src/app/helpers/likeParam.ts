@@ -1,0 +1,1 @@
+type LikesParam = 'likers' | 'likees';
