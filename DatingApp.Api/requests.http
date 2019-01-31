@@ -72,3 +72,6 @@ Authorization: {{authorization}}
 ###
 Get {{host}}/users/1/messages/1 HTTP/1.1
 Authorization: {{authorization}}
+###
+Get {{host}}/users/1/messages?messageContainer=outbox HTTP/1.1
+Authorization: {{authorization}}

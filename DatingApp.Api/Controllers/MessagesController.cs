@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using DatingApp.Api.Data;
@@ -28,9 +30,45 @@ namespace DatingApp.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> Get(int userId, [FromQuery]MessageParams messageParams)
         {
-            return Ok(await _context.Values.ToListAsync());
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+
+            messageParams.UserId = userId;
+
+            var messages = _context.Message
+                .Include(m => m.Sender)
+                .ThenInclude(u => u.Photos)
+                .Include(m => m.Recipient)
+                .ThenInclude(u => u.Photos)
+                .AsQueryable();
+
+            switch (messageParams.MessageContainer)
+            {
+                case "inbox":
+                    messages = messages.Where(m => m.RecipientId == messageParams.UserId);
+                    break;
+                case "outbox":
+                    messages = messages.Where(m => m.SenderId == messageParams.UserId);
+                    break;
+                default:
+                    messages = messages.Where(m => m.RecipientId == messageParams.UserId && m.IsRead);
+                    break;
+            }
+
+            messages = messages.OrderByDescending(d => d.MessageSent);
+
+            var pagedMessages =
+                await PagedList<Models.Message>.CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize);
+            var returnDtos = _mapper.Map<IEnumerable<Message>>(pagedMessages);
+            Response.AddPagination(pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalCount,
+                                   pagedMessages.TotalPages);
+
+            return Ok(returnDtos);
         }
 
         [HttpGet("{id}", Name = "GetMessage")]
@@ -46,7 +84,7 @@ namespace DatingApp.Api.Controllers
         }
 
         [HttpPost(Name = "CreateMessage")]
-        public async Task<IActionResult> Post(int userId, Message dto)
+        public async Task<IActionResult> Post(int userId, MessageCreate dto)
         {
             var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (userId != int.Parse(tokenId))
@@ -66,7 +104,7 @@ namespace DatingApp.Api.Controllers
             var message = _mapper.Map<Models.Message>(dto);
             _context.Message.Add(message);
             await _context.SaveChangesAsync();
-            var returnDto = _mapper.Map<Message>(message);
+            var returnDto = _mapper.Map<MessageCreate>(message);
 
             return CreatedAtRoute("GetMessage", new {id = message.Id}, returnDto);
         }
