@@ -103,16 +103,16 @@ export class UserService {
     const paginatedResult = new PaginatedResult<Message[]>();
 
     return this.http.get<Message[]>(
-      `${this.baseUrl}${this.authService.decondedToken.nameid}/messages/`, {observe: 'response', params}
-    ).pipe(
-      map(response => {
-        paginatedResult.result = response.body;
-        if (response.headers.get('pagination')) {
-          paginatedResult.pagination = JSON.parse(
-            response.headers.get('pagination')
-          );
-        }
-        return paginatedResult;
-      });
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/messages/`, {observe: 'response', params})
+        .pipe(
+          map(response => {
+            paginatedResult.result = response.body;
+            if (response.headers.get('pagination')) {
+              paginatedResult.pagination = JSON.parse(
+                response.headers.get('pagination')
+              );
+            }
+            return paginatedResult;
+          }));
   }
 }

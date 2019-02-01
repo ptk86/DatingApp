@@ -31,8 +31,8 @@ export class MessagesComponent implements OnInit {
   loadMessages(): void {
     this.userService
       .getMessages(
-        this.pagination.currentPage,
         this.pagination.itemsPerPage,
+        this.pagination.currentPage,
         this.messageContainer
       )
       .subscribe(
