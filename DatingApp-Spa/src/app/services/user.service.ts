@@ -134,4 +134,18 @@ export class UserService {
       message
     );
   }
+
+  deleteMessage(messageId: number) {
+    return this.http.post(
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/messages/${messageId}`,
+      {}
+    );
+  }
+
+  markAsRead(messageId: number) {
+    return this.http.post(
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/messages/${messageId}/read`,
+      {}
+    ).subscribe();
+  }
 }

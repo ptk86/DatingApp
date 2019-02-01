@@ -20,7 +20,7 @@ namespace DatingApp.Api.Helpers
             var user = await dataContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user != null)
             {
-                user.LastActive = DateTime.Now;
+                user.LastActive = DateTime.UtcNow;
             }
 
             await dataContext.SaveChangesAsync();

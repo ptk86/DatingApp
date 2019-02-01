@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -54,7 +55,7 @@ namespace DatingApp.Api.Controllers
                     messages = messages.Where(m => m.SenderId == messageParams.UserId && m.SenderDeleted == false);
                     break;
                 default:
-                    messages = messages.Where(m => m.RecipientId == messageParams.UserId && m.RecipientDeleted == false && m.IsRead);
+                    messages = messages.Where(m => m.RecipientId == messageParams.UserId && m.RecipientDeleted == false && !m.IsRead);
                     break;
             }
 
@@ -138,7 +139,7 @@ namespace DatingApp.Api.Controllers
             return CreatedAtRoute("GetMessage", new {id = message.Id}, returnDto);
         }
 
-        [HttpPost("{id}/Delete")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> Delete(int id, int userId)
         {
             var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -158,6 +159,25 @@ namespace DatingApp.Api.Controllers
             {
                 message.RecipientDeleted = true;
             }
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/read")]
+        public async Task<IActionResult> MarkMessageAsRead(int userId, int id)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            var message = await _context.Message.FirstOrDefaultAsync(m => m.Id == id);
+
+            if (message.RecipientId != userId)
+                return Unauthorized();
+
+            message.IsRead = true;
+            message.DateRead = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
