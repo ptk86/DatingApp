@@ -4,8 +4,9 @@ import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { UserDetail } from '../models/user-detail.model';
 import { AuthService } from './auth.service';
-import { PaginatedResultResult } from '../models/pagination';
+import { PaginatedResultResult as PaginatedResult } from '../models/pagination';
 import { map } from 'rxjs/operators';
+import { Message } from '../models/message';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class UserService {
     pageSize?,
     userParams?,
     likesParam?: LikesParam
-  ): Observable<PaginatedResultResult<UserDetail[]>> {
+  ): Observable<PaginatedResult<UserDetail[]>> {
     let params = new HttpParams();
     if (pageNumber && pageSize) {
       params = params.append('pageNumber', pageNumber);
@@ -42,7 +43,7 @@ export class UserService {
       params = params.append('likees', 'true');
     }
 
-    const paginatedResult = new PaginatedResultResult<UserDetail[]>();
+    const paginatedResult = new PaginatedResult<UserDetail[]>();
     return this.http
       .get<UserDetail[]>(this.baseUrl, { params, observe: 'response' })
       .pipe(
@@ -83,7 +84,35 @@ export class UserService {
 
   like(likeeId: number) {
     return this.http.post(
-      `${this.baseUrl}${this.authService.decondedToken.nameid}/like/${likeeId}`, {}
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/like/${likeeId}`,
+      {}
     );
+  }
+
+  getMessages(pageSize?, pageNumber?, messageContainer?: MessageContainer) {
+    let params = new HttpParams();
+    if (pageNumber && pageSize) {
+      params = params.append('pageNumber', pageNumber);
+      params = params.append('pageSize', pageSize);
+    }
+
+    if (messageContainer) {
+      params = params.append('messageContainer', messageContainer);
+    }
+
+    const paginatedResult = new PaginatedResult<Message[]>();
+
+    return this.http.get<Message[]>(
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/messages/`, {observe: 'response', params}
+    ).pipe(
+      map(response => {
+        paginatedResult.result = response.body;
+        if (response.headers.get('pagination')) {
+          paginatedResult.pagination = JSON.parse(
+            response.headers.get('pagination')
+          );
+        }
+        return paginatedResult;
+      });
   }
 }

@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Resolve, Router, ActivatedRouteSnapshot } from '@angular/router';
-import { UserDetail } from '../models/user-detail.model';
-import { UserService } from '../services/user.service';
-import { AlertifyService } from '../services/alertify.service';
+import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+
+import { UserDetail } from '../models/user-detail.model';
+import { AlertifyService } from '../services/alertify.service';
 import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
 
 @Injectable({
   providedIn: 'root'
