@@ -125,7 +125,13 @@ namespace DatingApp.Api.Controllers
             var message = _mapper.Map<Models.Message>(dto);
             _context.Message.Add(message);
             await _context.SaveChangesAsync();
-            var returnDto = _mapper.Map<MessageCreate>(message);
+            message = await _context.Message.Include(m => m.Sender)
+                          .ThenInclude(r => r.Photos)
+                          .Include(m => m.Recipient)
+                          .ThenInclude(r => r.Photos)
+                          .FirstOrDefaultAsync(m => m.Id == message.Id);
+            
+            var returnDto = _mapper.Map<Message>(message);
 
             return CreatedAtRoute("GetMessage", new {id = message.Id}, returnDto);
         }

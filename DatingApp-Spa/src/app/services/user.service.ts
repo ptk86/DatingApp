@@ -127,4 +127,11 @@ export class UserService {
       }/messages/thread/${recipientId}`
     );
   }
+
+  sendMessage(message: Message) {
+    return this.http.post(
+      `${this.baseUrl}${this.authService.decondedToken.nameid}/messages`,
+      message
+    );
+  }
 }
