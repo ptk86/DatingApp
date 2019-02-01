@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Text;
 using AutoMapper;
 using DatingApp.Api.Data;
@@ -68,7 +69,7 @@ namespace DatingApp.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Seeder seeder)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Seeder seeder, DataContext dataContext)
         {
             if (env.IsDevelopment())
             {
@@ -90,8 +91,12 @@ namespace DatingApp.Api
                                 });
                 });
             }
-            
-            //seeder.Seed();
+
+
+            if (!dataContext.Users.Any())
+            {
+                seeder.Seed();
+            }
             // app.UseHttpsRedirection();
             app.UseCors(c => c.AllowAnyOrigin()
                             .AllowAnyMethod()
