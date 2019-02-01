@@ -2,7 +2,6 @@
 using AutoMapper;
 using DatingApp.Api.Dto;
 using DatingApp.Api.Models;
-using Message = DatingApp.Api.Dto.Message;
 
 namespace DatingApp.Api.Helpers
 {
@@ -35,7 +34,7 @@ namespace DatingApp.Api.Helpers
             CreateMap<UserUpdate, User>();
             CreateMap<UserCreate, User>();
             CreateMap<MessageCreate, Models.Message>().ReverseMap();
-            CreateMap<Models.Message, Message>()
+            CreateMap<Models.Message, Dto.Message>()
                 .ForMember(dest => dest.SenderPhotoUrl, opt =>
                 {
                     opt.MapFrom(src => src.Sender.Photos.FirstOrDefault(p => p.IsMain).Url);

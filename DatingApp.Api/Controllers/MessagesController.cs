@@ -6,11 +6,9 @@ using AutoMapper;
 using DatingApp.Api.Data;
 using DatingApp.Api.Dto;
 using DatingApp.Api.Helpers;
-using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Message = DatingApp.Api.Dto.Message;
 
 namespace DatingApp.Api.Controllers
 {
@@ -64,7 +62,7 @@ namespace DatingApp.Api.Controllers
 
             var pagedMessages =
                 await PagedList<Models.Message>.CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize);
-            var returnDtos = _mapper.Map<IEnumerable<Message>>(pagedMessages);
+            var returnDtos = _mapper.Map<IEnumerable<Dto.Message>>(pagedMessages);
             Response.AddPagination(pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalCount,
                                    pagedMessages.TotalPages);
 
@@ -81,6 +79,29 @@ namespace DatingApp.Api.Controllers
             }
 
             return Ok(await _context.Message.FirstOrDefaultAsync(m => m.Id == id));
+        }
+
+        [HttpGet("thread/{recipientId}", Name = "Thread")]
+        public async Task<IActionResult> Thread(int userId, int recipientId)
+        {
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+
+            var thread = await _context.Message
+                .Include(m => m.Sender)
+                    .ThenInclude(r => r.Photos)
+                .Include(m => m.Recipient)
+                    .ThenInclude(r => r.Photos)
+                .Where(m => m.SenderId == userId && m.RecipientId == recipientId ||
+                            m.RecipientId == userId && m.SenderId == recipientId)
+                .OrderByDescending(m => m.MessageSent)
+                .ToListAsync();
+
+            var dtos = _mapper.Map<IEnumerable<Dto.Message>>(thread);
+            return Ok(dtos);
         }
 
         [HttpPost(Name = "CreateMessage")]
