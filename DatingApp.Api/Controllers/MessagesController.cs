@@ -48,13 +48,13 @@ namespace DatingApp.Api.Controllers
             switch (messageParams.MessageContainer)
             {
                 case "inbox":
-                    messages = messages.Where(m => m.RecipientId == messageParams.UserId);
+                    messages = messages.Where(m => m.RecipientId == messageParams.UserId && m.RecipientDeleted == false);
                     break;
                 case "outbox":
-                    messages = messages.Where(m => m.SenderId == messageParams.UserId);
+                    messages = messages.Where(m => m.SenderId == messageParams.UserId && m.SenderDeleted == false);
                     break;
                 default:
-                    messages = messages.Where(m => m.RecipientId == messageParams.UserId && m.IsRead);
+                    messages = messages.Where(m => m.RecipientId == messageParams.UserId && m.RecipientDeleted == false && m.IsRead);
                     break;
             }
 
@@ -91,14 +91,16 @@ namespace DatingApp.Api.Controllers
             }
 
             var thread = await _context.Message
-                .Include(m => m.Sender)
-                    .ThenInclude(r => r.Photos)
-                .Include(m => m.Recipient)
-                    .ThenInclude(r => r.Photos)
-                .Where(m => m.SenderId == userId && m.RecipientId == recipientId ||
-                            m.RecipientId == userId && m.SenderId == recipientId)
-                .OrderByDescending(m => m.MessageSent)
-                .ToListAsync();
+                             .Include(m => m.Sender)
+                             .ThenInclude(r => r.Photos)
+                             .Include(m => m.Recipient)
+                             .ThenInclude(r => r.Photos)
+                             .Where(m => m.SenderId == userId && m.RecipientId == recipientId &&
+                                         m.RecipientDeleted == false ||
+                                         m.RecipientId == userId && m.SenderId == recipientId &&
+                                         m.SenderDeleted == false)
+                             .OrderByDescending(m => m.MessageSent)
+                             .ToListAsync();
 
             var dtos = _mapper.Map<IEnumerable<Dto.Message>>(thread);
             return Ok(dtos);
@@ -136,7 +138,30 @@ namespace DatingApp.Api.Controllers
             return CreatedAtRoute("GetMessage", new {id = message.Id}, returnDto);
         }
 
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> Delete(int id) { }
+        [HttpPost("{id}/Delete")]
+        public async Task<IActionResult> Delete(int id, int userId)
+        {
+            var tokenId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId != int.Parse(tokenId))
+            {
+                return Unauthorized();
+            }
+
+            var message = await _context.Message.FirstOrDefaultAsync(m => m.Id == id);
+
+            if (message.SenderId == userId)
+            {
+                message.SenderDeleted = true;
+            }
+
+            if (message.RecipientId == userId)
+            {
+                message.RecipientDeleted = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
